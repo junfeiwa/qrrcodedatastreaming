@@ -7,23 +7,32 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
-
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.os.Environment;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+
+import com.example.qrrcodedatastreaming.R.id;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 public class MainActivity extends Activity {
 	public CameraPreview mPreview;
 	public Camera c;
+	private QRCodeWriter qw=new QRCodeWriter();
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	private static final int MEDIA_TYPE_VIDEO = 2;
+	private static final int WHITE = 0xFFFFFFFF;
+	  private static final int BLACK = 0xFF000000;
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +81,10 @@ public class MainActivity extends Activity {
                 }
             }
         };
+        String s="This is a test";
+        Bitmap b= encode(s);
+        ImageView iv=(ImageView) this.findViewById(id.qrcode_image);
+        iv.setImageBitmap(b);
 	}
 
 	@Override
@@ -112,5 +125,38 @@ public class MainActivity extends Activity {
 
 	        return mediaFile;
 	    }
-
+	 public Bitmap encode(String s){
+	    	
+         BitMatrix result=null;
+         
+         try {
+           try {
+  			result = qw.encode(s, BarcodeFormat.QR_CODE, 300, 300);
+  		} catch (WriterException e) {
+  			// TODO Auto-generated catch block
+  			//e.printStackTrace();
+  		}
+         } catch (IllegalArgumentException iae) {
+           // Unsupported format
+           
+         }
+         Log.i("123","good5");
+         int width = result.getWidth();
+         int height = result.getHeight();
+         int[] pixels = new int[width * height];
+         for (int y = 0; y < height; y++) {
+           int offset = y * width;
+           for (int x = 0; x < width; x++) {
+             pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
+           }
+         }
+         
+         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+         bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+         Log.i("123","should change image");
+         return bitmap;
+        // ImageView newiv=new ImageView(this);
+         //newiv.setImageBitmap(bitmap);
+         //this.setContentView(newiv);
+    }
 }
