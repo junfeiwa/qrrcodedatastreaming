@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 		c = null;
         Log.i("camera","good1");
         try {
-            c = Camera.open(0); // attempt to get a Camera instance
+            c = Camera.open(1); // attempt to get a Camera instance
             Log.i("camera","good2");
         }
         catch (Exception e){
