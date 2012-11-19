@@ -10,8 +10,10 @@ import java.util.Date;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.PreviewCallback;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -39,10 +41,10 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		c = null;
-        Log.i("camera","good1");
+        
         try {
             c = Camera.open(1); // attempt to get a Camera instance
-            Log.i("camera","good2");
+            
         }
         catch (Exception e){
             // Camera is not available (in use or does not exist)
@@ -60,27 +62,26 @@ public class MainActivity extends Activity {
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         
         preview.addView(mPreview);
-        final PictureCallback mPicture = new PictureCallback() {
+        final PreviewCallback mPicture = new PreviewCallback() {
 
-            public void onPictureTaken(byte[] data, Camera camera) {
+        	public void onPreviewFrame(byte[] data, Camera camera)  
+            { 
+                    try 
+                    { 
+                            BitmapFactory.Options opts = new BitmapFactory.Options(); 
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);//,opts); 
+                            Log.i("file","Bitmap captured");
+                    } 
+                    catch(Exception e) 
+                    {
+                    	Log.i("file","not captured");
+                    } 
+            } 
 
-                File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-                if (pictureFile == null){
-                   
-                    return;
-                }
-
-                try {
-                    FileOutputStream fos = new FileOutputStream(pictureFile);
-                    fos.write(data);
-                    fos.close();
-                } catch (FileNotFoundException e) {
-                    
-                } catch (IOException e) {
-                   
-                }
-            }
         };
+        Log.i("file","good1");
+        c.setPreviewCallback(mPicture);
+        Log.i("file","good2");
         String s="This is a test";
         Bitmap b= encode(s);
         ImageView iv=(ImageView) this.findViewById(id.qrcode_image);
@@ -115,7 +116,7 @@ public class MainActivity extends Activity {
 	        File mediaFile;
 	        if (type == MEDIA_TYPE_IMAGE){
 	            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-	            "IMG_"+ timeStamp + ".jpg");
+	            "IMG_123.jpg");
 	        } else if(type == MEDIA_TYPE_VIDEO) {
 	            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
 	            "VID_"+ timeStamp + ".mp4");
