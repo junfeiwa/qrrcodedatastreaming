@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
 
         };
         Log.i("file","good1");
-        c.setPreviewCallback(mPicture);
+        c.setPreviewCallbackWithBuffer(mPicture);
         Log.i("file","good2");
         String s="This is a test";
         Bitmap b= encode(s);
